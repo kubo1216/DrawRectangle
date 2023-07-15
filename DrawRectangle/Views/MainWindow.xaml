@@ -1,0 +1,58 @@
+﻿<Window x:Class="DrawRectangle.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:prism="http://prismlibrary.com/"
+        xmlns:rp="clr-namespace:Reactive.Bindings.Interactivity;assembly=ReactiveProperty.WPF"
+        xmlns:local="clr-namespace:DrawRectangle.Views.Converter"
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        Title="{Binding Title}" Height="350" Width="525" >
+    
+    <Grid Background="LightGray">
+        <!--画像を配置-->
+        <Image Source="{Binding Image.Value}" Margin="10">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SizeChanged">
+                    <prism:InvokeCommandAction Command="{Binding SizeChangedCommand}"/>
+                </i:EventTrigger>
+                <i:EventTrigger EventName="Loaded">
+                    <prism:InvokeCommandAction Command="{Binding LoadCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </Image>
+
+        <Label Content="{Binding SelectedArea.Value}"/>
+        <!--座標取得/お絵描き用のCanvas-->
+        <Canvas Width="{Binding CanvasWidth.Value}"
+                Height="{Binding CanvasHeight.Value}"
+                Background="#8800ffff"
+                Margin="10">
+            <!--ドラッグアンドドロップ用のイベント-->
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseDown">
+                    <rp:EventToReactiveCommand Command="{Binding MouseDownCommand}">
+                        <local:MouseToPointConverter/>
+                    </rp:EventToReactiveCommand>
+                </i:EventTrigger>
+                <i:EventTrigger EventName="MouseMove">
+                    <rp:EventToReactiveCommand Command="{Binding MouseMoveCommand}">
+                        <local:MouseToPointConverter/>
+                    </rp:EventToReactiveCommand>
+                </i:EventTrigger>
+                <i:EventTrigger EventName="MouseUp">
+                    <rp:EventToReactiveCommand Command="{Binding MouseUpCommand}">
+                        <local:MouseToPointConverter/>
+                    </rp:EventToReactiveCommand>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            
+            <!--矩形選択-->
+            <Rectangle Width="{Binding Rect.Value.Width}"
+                       Height="{Binding Rect.Value.Height}"
+                       Canvas.Left="{Binding Rect.Value.X}"
+                       Canvas.Top="{Binding Rect.Value.Y}"
+                       StrokeThickness="3" Stroke="OrangeRed"/>
+        </Canvas>
+
+    </Grid>
+</Window>
